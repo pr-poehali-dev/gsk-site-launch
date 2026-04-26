@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import Icon from '@/components/ui/icon';
+import func2url from '../../backend/func2url.json';
+
+const API_URL = func2url['member-application'];
 
 /* ── Данные заглушки ── */
 const payments = [
@@ -67,6 +70,8 @@ function Field({
 function RegistrationForm({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormData>(emptyForm);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const set = (key: keyof FormData) => (v: string) => setForm((f) => ({ ...f, [key]: v }));
 
@@ -230,11 +235,18 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
       </div>
 
       {/* Navigation */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex gap-2 items-center text-sm text-red-700">
+          <Icon name="AlertCircle" size={15} className="flex-shrink-0" />
+          {error}
+        </div>
+      )}
       <div className="flex gap-3 justify-between">
         {step > 0 ? (
           <button
             onClick={() => setStep((s) => s - 1)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            disabled={loading}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-40"
           >
             <Icon name="ArrowLeft" size={16} /> Назад
           </button>
@@ -251,11 +263,48 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
           </button>
         ) : (
           <button
-            onClick={onDone}
-            disabled={!canNext()}
+            onClick={async () => {
+              setLoading(true);
+              setError('');
+              try {
+                const res = await fetch(API_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    last_name: form.lastName,
+                    first_name: form.firstName,
+                    middle_name: form.middleName,
+                    address_city: form.addressCity,
+                    address_street: form.address,
+                    address_postal: form.addressPostal,
+                    passport_series: form.passportSeries,
+                    passport_number: form.passportNumber,
+                    passport_issued: form.passportIssued,
+                    passport_date: form.passportDate,
+                    passport_code: form.passportCode,
+                    ownership_cert: form.ownershipCert,
+                    cadastral_number: form.cadastralNumber,
+                  }),
+                });
+                if (!res.ok) {
+                  const data = await res.json();
+                  setError(data.error || 'Ошибка сервера. Попробуйте ещё раз.');
+                } else {
+                  onDone();
+                }
+              } catch {
+                setError('Не удалось подключиться к серверу. Проверьте интернет-соединение.');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={!canNext() || loading}
             className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Icon name="CheckCircle" size={16} /> Отправить анкету
+            {loading
+              ? <><Icon name="Loader" size={16} className="animate-spin" /> Отправка...</>
+              : <><Icon name="CheckCircle" size={16} /> Отправить анкету</>
+            }
           </button>
         )}
       </div>

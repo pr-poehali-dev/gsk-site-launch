@@ -1,0 +1,38 @@
+{
+  "tests": [
+    {
+      "name": "POST — сохранение анкеты",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "last_name": "Тестов",
+        "first_name": "Тест",
+        "middle_name": "Тестович",
+        "address_city": "Нижний Новгород",
+        "address_street": "ул. Тестовая, д. 1",
+        "address_postal": "603000",
+        "passport_series": "4420",
+        "passport_number": "123456",
+        "passport_issued": "МВД России",
+        "passport_date": "01.01.2015",
+        "passport_code": "520-001",
+        "ownership_cert": "52-НН 000001",
+        "cadastral_number": "52:18:0020001:999"
+      },
+      "expectedStatus": 201
+    },
+    {
+      "name": "GET — список заявок",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "POST — ошибка при пустых полях",
+      "method": "POST",
+      "path": "/",
+      "body": {"last_name": "Только фамилия"},
+      "expectedStatus": 400
+    }
+  ]
+}
