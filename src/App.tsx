@@ -61,7 +61,12 @@ const staticPages: Partial<Record<PageId, React.ReactNode>> = {
 function Layout() {
   const [page, setPage] = useState<PageId>('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [registered, setRegistered] = useState(false);
+  const [registered, setRegistered] = useState(() => localStorage.getItem('gsk_registered') === 'true');
+
+  const handleRegistered = () => {
+    localStorage.setItem('gsk_registered', 'true');
+    setRegistered(true);
+  };
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -176,7 +181,7 @@ function Layout() {
               onGoRegister={() => setPage('cabinet')}
             />
           ) : page === 'cabinet' ? (
-            <Cabinet registered={registered} onRegistered={() => setRegistered(true)} />
+            <Cabinet registered={registered} onRegistered={handleRegistered} />
           ) : (
             staticPages[page]
           )}
