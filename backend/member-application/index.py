@@ -24,6 +24,7 @@ def handler(event: dict, context) -> dict:
             body = json.loads(event.get('body') or '{}')
 
             required = ['last_name', 'first_name', 'middle_name',
+                        'phone',
                         'address_city', 'address_street',
                         'passport_series', 'passport_number',
                         'passport_issued', 'passport_date',
@@ -40,13 +41,15 @@ def handler(event: dict, context) -> dict:
             cur.execute(f"""
                 INSERT INTO {schema}.member_applications
                     (last_name, first_name, middle_name,
+                     phone, email,
                      address_city, address_street, address_postal,
                      passport_series, passport_number, passport_issued, passport_date, passport_code,
                      ownership_cert, cadastral_number, status)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'pending')
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'pending')
                 RETURNING id, created_at
             """, (
                 body['last_name'], body['first_name'], body['middle_name'],
+                body['phone'], body.get('email'),
                 body['address_city'], body['address_street'], body.get('address_postal', ''),
                 body['passport_series'], body['passport_number'],
                 body['passport_issued'], body['passport_date'], body.get('passport_code', ''),
@@ -66,6 +69,7 @@ def handler(event: dict, context) -> dict:
             cur = conn.cursor()
             cur.execute(f"""
                 SELECT id, last_name, first_name, middle_name,
+                       phone, email,
                        address_city, address_street,
                        ownership_cert, cadastral_number,
                        status, created_at
@@ -76,6 +80,7 @@ def handler(event: dict, context) -> dict:
             rows = cur.fetchall()
             cur.close()
             cols = ['id','last_name','first_name','middle_name',
+                    'phone','email',
                     'address_city','address_street',
                     'ownership_cert','cadastral_number',
                     'status','created_at']

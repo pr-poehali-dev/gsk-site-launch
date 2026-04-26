@@ -22,6 +22,7 @@ const notifications = [
 /* ── Типы анкеты ── */
 type FormData = {
   lastName: string; firstName: string; middleName: string;
+  phone: string; email: string;
   address: string; addressCity: string; addressPostal: string;
   passportSeries: string; passportNumber: string; passportIssued: string; passportDate: string; passportCode: string;
   ownershipCert: string;
@@ -30,6 +31,7 @@ type FormData = {
 
 const emptyForm: FormData = {
   lastName: '', firstName: '', middleName: '',
+  phone: '', email: '',
   address: '', addressCity: '', addressPostal: '',
   passportSeries: '', passportNumber: '', passportIssued: '', passportDate: '', passportCode: '',
   ownershipCert: '',
@@ -78,7 +80,7 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
   const progress = ((step) / STEPS.length) * 100;
 
   const canNext = (): boolean => {
-    if (step === 0) return !!(form.lastName && form.firstName && form.middleName);
+    if (step === 0) return !!(form.lastName && form.firstName && form.middleName && form.phone);
     if (step === 1) return !!(form.address && form.addressCity);
     if (step === 2) return !!(form.passportSeries && form.passportNumber && form.passportIssued && form.passportDate);
     if (step === 3) return !!form.ownershipCert;
@@ -137,11 +139,28 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Icon name="User" size={18} className="text-primary" />
-              <h3 className="font-semibold text-foreground">Фамилия, Имя, Отчество</h3>
+              <h3 className="font-semibold text-foreground">ФИО и контактные данные</h3>
             </div>
             <Field label="Фамилия" value={form.lastName} onChange={set('lastName')} placeholder="Иванов" />
             <Field label="Имя" value={form.firstName} onChange={set('firstName')} placeholder="Иван" />
             <Field label="Отчество" value={form.middleName} onChange={set('middleName')} placeholder="Иванович" />
+            <div className="border-t border-border pt-4 space-y-4">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Контактные данные</p>
+              <Field
+                label="Номер телефона *"
+                value={form.phone}
+                onChange={set('phone')}
+                placeholder="+7 (900) 000-00-00"
+                hint="Обязательное поле — для связи по вопросам кооператива"
+              />
+              <Field
+                label="Электронная почта"
+                value={form.email}
+                onChange={set('email')}
+                placeholder="example@mail.ru"
+                hint="Необязательно — для получения уведомлений"
+              />
+            </div>
           </div>
         )}
 
@@ -274,6 +293,8 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
                     last_name: form.lastName,
                     first_name: form.firstName,
                     middle_name: form.middleName,
+                    phone: form.phone,
+                    email: form.email || null,
                     address_city: form.addressCity,
                     address_street: form.address,
                     address_postal: form.addressPostal,
@@ -371,6 +392,7 @@ export default function Cabinet() {
           <div className="w-full text-left space-y-2 mb-6">
             {[
               'Фамилия, Имя, Отчество',
+              'Контактный телефон и e-mail',
               'Адрес проживания',
               'Паспортные данные',
               'Свидетельство права собственности',

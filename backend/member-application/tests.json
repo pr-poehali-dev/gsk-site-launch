@@ -8,6 +8,8 @@
         "last_name": "Тестов",
         "first_name": "Тест",
         "middle_name": "Тестович",
+        "phone": "+7 (900) 000-00-00",
+        "email": "test@example.com",
         "address_city": "Нижний Новгород",
         "address_street": "ул. Тестовая, д. 1",
         "address_postal": "603000",
