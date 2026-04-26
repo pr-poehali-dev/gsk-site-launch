@@ -18,6 +18,8 @@
         "passport_issued": "МВД России",
         "passport_date": "01.01.2015",
         "passport_code": "520-001",
+        "module_name": "А",
+        "garage_number": "147",
         "ownership_cert": "52-НН 000001",
         "cadastral_number": "52:18:0020001:999"
       },

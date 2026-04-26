@@ -25,6 +25,7 @@ type FormData = {
   phone: string; email: string;
   address: string; addressCity: string; addressPostal: string;
   passportSeries: string; passportNumber: string; passportIssued: string; passportDate: string; passportCode: string;
+  moduleName: string; garageNumber: string;
   ownershipCert: string;
   cadastralNumber: string;
 };
@@ -34,6 +35,7 @@ const emptyForm: FormData = {
   phone: '', email: '',
   address: '', addressCity: '', addressPostal: '',
   passportSeries: '', passportNumber: '', passportIssued: '', passportDate: '', passportCode: '',
+  moduleName: '', garageNumber: '',
   ownershipCert: '',
   cadastralNumber: '',
 };
@@ -83,7 +85,7 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
     if (step === 0) return !!(form.lastName && form.firstName && form.middleName && form.phone);
     if (step === 1) return !!(form.address && form.addressCity);
     if (step === 2) return !!(form.passportSeries && form.passportNumber && form.passportIssued && form.passportDate);
-    if (step === 3) return !!form.ownershipCert;
+    if (step === 3) return !!(form.moduleName && form.garageNumber && form.ownershipCert);
     if (step === 4) return !!form.cadastralNumber;
     return true;
   };
@@ -210,7 +212,27 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
               <Icon name="Home" size={18} className="text-primary" />
-              <h3 className="font-semibold text-foreground">Свидетельство права собственности</h3>
+              <h3 className="font-semibold text-foreground">Гараж и право собственности</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <Field
+                  label="Наименование модуля *"
+                  value={form.moduleName}
+                  onChange={set('moduleName')}
+                  placeholder="А, Б, В..."
+                  hint="Буква или название блока/модуля"
+                />
+              </div>
+              <div className="col-span-1">
+                <Field
+                  label="Номер гаража *"
+                  value={form.garageNumber}
+                  onChange={set('garageNumber')}
+                  placeholder="147"
+                  hint="Порядковый номер бокса"
+                />
+              </div>
             </div>
             <Field
               label="Номер свидетельства"
@@ -303,6 +325,8 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
                     passport_issued: form.passportIssued,
                     passport_date: form.passportDate,
                     passport_code: form.passportCode,
+                    module_name: form.moduleName,
+                    garage_number: form.garageNumber,
                     ownership_cert: form.ownershipCert,
                     cadastral_number: form.cadastralNumber,
                   }),

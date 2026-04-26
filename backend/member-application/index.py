@@ -28,6 +28,7 @@ def handler(event: dict, context) -> dict:
                         'address_city', 'address_street',
                         'passport_series', 'passport_number',
                         'passport_issued', 'passport_date',
+                        'module_name', 'garage_number',
                         'ownership_cert', 'cadastral_number']
             missing = [f for f in required if not body.get(f)]
             if missing:
@@ -44,8 +45,9 @@ def handler(event: dict, context) -> dict:
                      phone, email,
                      address_city, address_street, address_postal,
                      passport_series, passport_number, passport_issued, passport_date, passport_code,
+                     module_name, garage_number,
                      ownership_cert, cadastral_number, status)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'pending')
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'pending')
                 RETURNING id, created_at
             """, (
                 body['last_name'], body['first_name'], body['middle_name'],
@@ -53,6 +55,7 @@ def handler(event: dict, context) -> dict:
                 body['address_city'], body['address_street'], body.get('address_postal', ''),
                 body['passport_series'], body['passport_number'],
                 body['passport_issued'], body['passport_date'], body.get('passport_code', ''),
+                body['module_name'], body['garage_number'],
                 body['ownership_cert'], body['cadastral_number'],
             ))
             row = cur.fetchone()
@@ -71,6 +74,7 @@ def handler(event: dict, context) -> dict:
                 SELECT id, last_name, first_name, middle_name,
                        phone, email,
                        address_city, address_street,
+                       module_name, garage_number,
                        ownership_cert, cadastral_number,
                        status, created_at
                 FROM {schema}.member_applications
@@ -82,6 +86,7 @@ def handler(event: dict, context) -> dict:
             cols = ['id','last_name','first_name','middle_name',
                     'phone','email',
                     'address_city','address_street',
+                    'module_name','garage_number',
                     'ownership_cert','cadastral_number',
                     'status','created_at']
             result = [dict(zip(cols, [str(v) if not isinstance(v, (str, int, type(None))) else v for v in r])) for r in rows]
