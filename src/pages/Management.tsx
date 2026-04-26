@@ -1,5 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
+import func2url from '../../backend/func2url.json';
+
+const API_URL = func2url['member-application'];
+
+type Application = {
+  id: number;
+  last_name: string;
+  first_name: string;
+  middle_name: string;
+  phone: string;
+  email: string | null;
+  address_city: string;
+  address_street: string;
+  module_name: string;
+  garage_number: string;
+  ownership_cert: string;
+  cadastral_number: string;
+  status: string;
+  created_at: string;
+};
 
 const members = [
   { id: 1, name: 'Петров А.Н.', box: '147', status: 'paid', debt: '—', since: '2018' },
@@ -16,12 +36,28 @@ const votes = [
   { id: 3, title: 'Установка видеонаблюдения на въезде', end: '1 апр 2026', yes: 142, no: 67, abstain: 22, total: 231, open: false },
 ];
 
-type Tab = 'members' | 'voting' | 'fees';
+type Tab = 'members' | 'voting' | 'fees' | 'applications';
 
 export default function Management() {
   const [tab, setTab] = useState<Tab>('members');
   const [search, setSearch] = useState('');
   const [voted, setVoted] = useState<Record<number, string>>({});
+
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [appLoading, setAppLoading] = useState(false);
+  const [appError, setAppError] = useState('');
+  const [expanded, setExpanded] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (tab !== 'applications') return;
+    setAppLoading(true);
+    setAppError('');
+    fetch(API_URL)
+      .then((r) => r.json())
+      .then((data) => setApplications(data))
+      .catch(() => setAppError('Не удалось загрузить заявки'))
+      .finally(() => setAppLoading(false));
+  }, [tab]);
 
   const filteredMembers = members.filter((m) =>
     m.name.toLowerCase().includes(search.toLowerCase()) || m.box.includes(search)
@@ -34,8 +70,8 @@ export default function Management() {
         <p className="text-sm text-muted-foreground mt-0.5">Администрирование кооператива</p>
       </div>
 
-      <div className="flex gap-1 border-b border-border">
-        {([['members', 'Члены ГСК'], ['voting', 'Голосования'], ['fees', 'Взносы']] as [Tab, string][]).map(([key, label]) => (
+      <div className="flex gap-1 border-b border-border overflow-x-auto">
+        {([['members', 'Члены ГСК'], ['voting', 'Голосования'], ['fees', 'Взносы'], ['applications', 'Заявки']] as [Tab, string][]).map(([key, label]) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -186,6 +222,93 @@ export default function Management() {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {tab === 'applications' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {appLoading ? 'Загрузка...' : `Всего заявок: ${applications.length}`}
+            </p>
+          </div>
+
+          {appError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex gap-2 items-center text-sm text-red-700">
+              <Icon name="AlertCircle" size={15} className="flex-shrink-0" />
+              {appError}
+            </div>
+          )}
+
+          {appLoading && (
+            <div className="flex items-center justify-center py-16">
+              <Icon name="Loader" size={24} className="text-muted-foreground animate-spin" />
+            </div>
+          )}
+
+          {!appLoading && !appError && applications.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Icon name="ClipboardList" size={36} className="text-muted-foreground/40 mb-3" />
+              <p className="text-sm text-muted-foreground">Заявок пока нет</p>
+            </div>
+          )}
+
+          {!appLoading && applications.map((a) => {
+            const isOpen = expanded === a.id;
+            const statusMap: Record<string, { label: string; cls: string }> = {
+              pending: { label: 'На рассмотрении', cls: 'bg-amber-100 text-amber-700' },
+              approved: { label: 'Одобрено', cls: 'bg-green-100 text-green-700' },
+              rejected: { label: 'Отклонено', cls: 'bg-red-100 text-red-700' },
+            };
+            const st = statusMap[a.status] ?? { label: a.status, cls: 'bg-secondary text-muted-foreground' };
+            const fio = `${a.last_name} ${a.first_name} ${a.middle_name}`;
+            const date = new Date(a.created_at).toLocaleDateString('ru-RU');
+
+            return (
+              <div key={a.id} className="bg-card border border-border rounded-xl overflow-hidden">
+                <button
+                  className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-muted/30 transition-colors"
+                  onClick={() => setExpanded(isOpen ? null : a.id)}
+                >
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
+                    {a.last_name[0]}{a.first_name[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground truncate">{fio}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Модуль <span className="font-semibold text-foreground">{a.module_name}</span>
+                      {' · '}Гараж <span className="font-semibold text-foreground">№{a.garage_number}</span>
+                      {' · '}{date}
+                    </p>
+                  </div>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded flex-shrink-0 ${st.cls}`}>{st.label}</span>
+                  <Icon name={isOpen ? 'ChevronUp' : 'ChevronDown'} size={16} className="text-muted-foreground flex-shrink-0" />
+                </button>
+
+                {isOpen && (
+                  <div className="border-t border-border px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Контакты</p>
+                      <p className="text-foreground">{a.phone}</p>
+                      {a.email && <p className="text-muted-foreground">{a.email}</p>}
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Адрес</p>
+                      <p className="text-foreground">{a.address_city}, {a.address_street}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Свидетельство</p>
+                      <p className="text-foreground">{a.ownership_cert}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Кадастровый номер</p>
+                      <p className="text-foreground">{a.cadastral_number}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
