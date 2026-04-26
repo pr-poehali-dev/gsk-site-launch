@@ -37,6 +37,20 @@
       "path": "/",
       "body": {"last_name": "Только фамилия"},
       "expectedStatus": 400
+    },
+    {
+      "name": "PATCH — одобрить заявку",
+      "method": "PATCH",
+      "path": "/",
+      "body": {"id": 1, "status": "approved"},
+      "expectedStatus": 200
+    },
+    {
+      "name": "PATCH — ошибка неверного статуса",
+      "method": "PATCH",
+      "path": "/",
+      "body": {"id": 1, "status": "unknown"},
+      "expectedStatus": 400
     }
   ]
 }

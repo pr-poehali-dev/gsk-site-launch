@@ -47,6 +47,24 @@ export default function Management() {
   const [appLoading, setAppLoading] = useState(false);
   const [appError, setAppError] = useState('');
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+
+  const updateStatus = async (id: number, status: 'approved' | 'rejected') => {
+    setActionLoading(id);
+    try {
+      const res = await fetch(API_URL, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status }),
+      });
+      if (res.ok) {
+        setApplications((prev) => prev.map((a) => a.id === id ? { ...a, status } : a));
+        setExpanded(null);
+      }
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   useEffect(() => {
     if (tab !== 'applications') return;
@@ -286,24 +304,58 @@ export default function Management() {
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-border px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Контакты</p>
-                      <p className="text-foreground">{a.phone}</p>
-                      {a.email && <p className="text-muted-foreground">{a.email}</p>}
+                  <div className="border-t border-border px-5 py-4 space-y-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Контакты</p>
+                        <p className="text-foreground">{a.phone}</p>
+                        {a.email && <p className="text-muted-foreground">{a.email}</p>}
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Адрес</p>
+                        <p className="text-foreground">{a.address_city}, {a.address_street}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Свидетельство</p>
+                        <p className="text-foreground">{a.ownership_cert}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Кадастровый номер</p>
+                        <p className="text-foreground">{a.cadastral_number}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Адрес</p>
-                      <p className="text-foreground">{a.address_city}, {a.address_street}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Свидетельство</p>
-                      <p className="text-foreground">{a.ownership_cert}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">Кадастровый номер</p>
-                      <p className="text-foreground">{a.cadastral_number}</p>
-                    </div>
+                    {a.status === 'pending' && (
+                      <div className="flex gap-3 pt-1">
+                        <button
+                          onClick={() => updateStatus(a.id, 'approved')}
+                          disabled={actionLoading === a.id}
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50"
+                        >
+                          {actionLoading === a.id
+                            ? <Icon name="Loader" size={15} className="animate-spin" />
+                            : <Icon name="CheckCircle" size={15} />}
+                          Одобрить
+                        </button>
+                        <button
+                          onClick={() => updateStatus(a.id, 'rejected')}
+                          disabled={actionLoading === a.id}
+                          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50"
+                        >
+                          <Icon name="XCircle" size={15} />
+                          Отклонить
+                        </button>
+                      </div>
+                    )}
+                    {a.status !== 'pending' && (
+                      <button
+                        onClick={() => updateStatus(a.id, 'pending')}
+                        disabled={actionLoading === a.id}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground border border-border hover:bg-muted transition-colors disabled:opacity-50"
+                      >
+                        <Icon name="RotateCcw" size={14} />
+                        Вернуть на рассмотрение
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
