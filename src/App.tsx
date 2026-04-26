@@ -27,10 +27,31 @@ const navItems: { id: PageId; label: string; icon: string }[] = [
   { id: 'contacts', label: 'Контакты', icon: 'Phone' },
 ];
 
-const pages: Record<PageId, React.ReactNode> = {
+const RESTRICTED: PageId[] = ['announcements', 'forum', 'contacts'];
+
+function GuestWall({ pageName, onGoRegister }: { pageName: string; onGoRegister: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'hsl(220,45%,14%)' }}>
+        <Icon name="Lock" size={28} className="text-amber-400" />
+      </div>
+      <h2 className="text-xl font-bold text-foreground mb-2">Раздел только для членов ГСК</h2>
+      <p className="text-sm text-muted-foreground max-w-xs leading-relaxed mb-6">
+        «{pageName}» доступен только зарегистрированным участникам кооператива. Заполните анкету — это займёт около 3 минут.
+      </p>
+      <button
+        onClick={onGoRegister}
+        className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
+      >
+        Зарегистрироваться в ГСК
+      </button>
+    </div>
+  );
+}
+
+const staticPages: Partial<Record<PageId, React.ReactNode>> = {
   home: <Home />,
   documents: <Documents />,
-  cabinet: <Cabinet />,
   announcements: <Announcements />,
   forum: <Forum />,
   contacts: <Contacts />,
@@ -40,6 +61,7 @@ const pages: Record<PageId, React.ReactNode> = {
 function Layout() {
   const [page, setPage] = useState<PageId>('home');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -73,32 +95,35 @@ function Layout() {
 
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => { setPage(item.id); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
-                page === item.id
-                  ? 'text-white'
-                  : 'hover:text-white'
-              }`}
-              style={
-                page === item.id
-                  ? { background: 'hsl(220,40%,20%)' }
-                  : { color: 'hsl(216,20%,65%)' }
-              }
-            >
-              <Icon
-                name={item.icon}
-                size={17}
-                className={page === item.id ? 'text-amber-400' : ''}
-              />
-              {item.label}
-              {item.id === 'announcements' && (
-                <span className="ml-auto w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'hsl(38,92%,50%)', color: 'hsl(220,40%,10%)' }}>2</span>
-              )}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const isLocked = RESTRICTED.includes(item.id) && !registered;
+            return (
+              <button
+                key={item.id}
+                onClick={() => { setPage(item.id); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
+                  page === item.id ? 'text-white' : 'hover:text-white'
+                }`}
+                style={
+                  page === item.id
+                    ? { background: 'hsl(220,40%,20%)' }
+                    : { color: 'hsl(216,20%,65%)' }
+                }
+              >
+                <Icon
+                  name={item.icon}
+                  size={17}
+                  className={page === item.id ? 'text-amber-400' : ''}
+                />
+                {item.label}
+                {isLocked ? (
+                  <Icon name="Lock" size={12} className="ml-auto opacity-40" />
+                ) : item.id === 'announcements' && registered ? (
+                  <span className="ml-auto w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'hsl(38,92%,50%)', color: 'hsl(220,40%,10%)' }}>2</span>
+                ) : null}
+              </button>
+            );
+          })}
         </nav>
 
         {/* User */}
@@ -145,7 +170,16 @@ function Layout() {
 
         {/* Content */}
         <main className="flex-1 px-4 sm:px-6 py-6 max-w-5xl w-full mx-auto">
-          {pages[page]}
+          {RESTRICTED.includes(page) && !registered ? (
+            <GuestWall
+              pageName={navItems.find((n) => n.id === page)!.label}
+              onGoRegister={() => setPage('cabinet')}
+            />
+          ) : page === 'cabinet' ? (
+            <Cabinet registered={registered} onRegistered={() => setRegistered(true)} />
+          ) : (
+            staticPages[page]
+          )}
         </main>
       </div>
     </div>

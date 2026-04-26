@@ -334,9 +334,8 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
 }
 
 /* ── Основной кабинет ── */
-export default function Cabinet() {
+export default function Cabinet({ registered = false, onRegistered }: { registered?: boolean; onRegistered?: () => void }) {
   const [tab, setTab] = useState<'info' | 'payments' | 'notifications'>('info');
-  const [registered, setRegistered] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -351,7 +350,7 @@ export default function Cabinet() {
           Председатель ГСК проверит данные и подтвердит вашу регистрацию в течение 1–2 рабочих дней.
         </p>
         <button
-          onClick={() => { setSubmitted(false); setRegistered(true); setShowForm(false); }}
+          onClick={() => { setSubmitted(false); onRegistered?.(); setShowForm(false); }}
           className="mt-6 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
         >
           Перейти в кабинет
