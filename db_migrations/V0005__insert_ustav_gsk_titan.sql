@@ -1,0 +1,1 @@
+INSERT INTO t_p1160872_gsk_site_launch.documents (name, category, file_url, file_size) VALUES ('Устав ГСК «ТИТАН»', 'Устав', 'https://cdn.poehali.dev/projects/17e93aa8-dbde-4697-9018-34c2f19ff8b0/bucket/024d6e73-fdec-4236-9b2e-83b6bfd76f4f.pdf', '');
