@@ -47,7 +47,7 @@ export default function Home() {
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <p className="text-amber-400 text-sm font-semibold tracking-widest uppercase mb-2">Добро пожаловать</p>
-              <h1 className="text-white text-3xl font-bold leading-tight mb-2">ГСК «Авангард»</h1>
+              <h1 className="text-white text-3xl font-bold leading-tight mb-2">ГСК «ТИТАН»</h1>
               <p className="text-blue-200 text-base">Портал управления гаражным кооперативом</p>
             </div>
             <div className="text-right">
