@@ -34,35 +34,40 @@ const navItems: { id: PageId; label: string; icon: string }[] = [
   { id: "contacts", label: "Контакты", icon: "Phone" },
 ];
 
-const RESTRICTED: PageId[] = ["announcements", "forum", "contacts"];
+const RESTRICTED: PageId[] = ["documents", "forum", "cabinet", "contacts"];
+const PROFILE_REQUIRED: PageId[] = ["documents", "forum", "cabinet", "contacts"];
 
 function GuestWall({
   pageName,
   onGoRegister,
+  reason,
 }: {
   pageName: string;
   onGoRegister: () => void;
+  reason: "not_registered" | "no_profile";
 }) {
+  const isProfile = reason === "no_profile";
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in">
       <div
         className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
         style={{ background: "hsl(220,45%,14%)" }}
       >
-        <Icon name="Lock" size={28} className="text-amber-400" />
+        <Icon name={isProfile ? "ClipboardList" : "Lock"} size={28} className="text-amber-400" />
       </div>
       <h2 className="text-xl font-bold text-foreground mb-2">
-        Раздел только для членов ГСК
+        {isProfile ? "Заполните анкету собственника" : "Раздел только для членов ГСК"}
       </h2>
       <p className="text-sm text-muted-foreground max-w-xs leading-relaxed mb-6">
-        «{pageName}» доступен только зарегистрированным участникам кооператива.
-        Заполните анкету — это займёт около 3 минут.
+        {isProfile
+          ? `Чтобы открыть «${pageName}», нужно заполнить анкету собственника гаража. Это займёт около 3 минут.`
+          : `«${pageName}» доступен только зарегистрированным участникам кооператива. Заполните анкету — это займёт около 3 минут.`}
       </p>
       <button
         onClick={onGoRegister}
         className="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-primary hover:opacity-90 transition-opacity"
       >
-        Зарегистрироваться в ГСК
+        {isProfile ? "Заполнить анкету" : "Зарегистрироваться в ГСК"}
       </button>
     </div>
   );
@@ -83,10 +88,15 @@ function Layout() {
   const [registered, setRegistered] = useState(
     () => localStorage.getItem("gsk_registered") === "true",
   );
+  const [profileComplete, setProfileComplete] = useState(
+    () => localStorage.getItem("gsk_profile_complete") === "true",
+  );
 
   const handleRegistered = () => {
     localStorage.setItem("gsk_registered", "true");
+    localStorage.setItem("gsk_profile_complete", "true");
     setRegistered(true);
+    setProfileComplete(true);
   };
 
   return (
@@ -132,7 +142,7 @@ function Layout() {
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           {navItems.map((item) => {
-            const isLocked = RESTRICTED.includes(item.id) && !registered;
+            const isLocked = (RESTRICTED.includes(item.id) && !registered) || (PROFILE_REQUIRED.includes(item.id) && registered && !profileComplete);
             return (
               <button
                 key={item.id}
@@ -242,6 +252,13 @@ function Layout() {
             <GuestWall
               pageName={navItems.find((n) => n.id === page)!.label}
               onGoRegister={() => setPage("cabinet")}
+              reason="not_registered"
+            />
+          ) : PROFILE_REQUIRED.includes(page) && registered && !profileComplete && page !== "cabinet" ? (
+            <GuestWall
+              pageName={navItems.find((n) => n.id === page)!.label}
+              onGoRegister={() => setPage("cabinet")}
+              reason="no_profile"
             />
           ) : page === "cabinet" ? (
             <Cabinet registered={registered} onRegistered={handleRegistered} />
