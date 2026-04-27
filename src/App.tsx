@@ -34,8 +34,8 @@ const navItems: { id: PageId; label: string; icon: string }[] = [
   { id: "contacts", label: "Контакты", icon: "Phone" },
 ];
 
-const RESTRICTED: PageId[] = ["documents", "forum", "cabinet", "contacts"];
-const PROFILE_REQUIRED: PageId[] = ["documents", "forum", "cabinet", "contacts"];
+const RESTRICTED: PageId[] = ["documents", "forum", "contacts"];
+const PROFILE_REQUIRED: PageId[] = ["documents", "forum", "contacts"];
 
 function GuestWall({
   pageName,
