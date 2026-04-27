@@ -1,0 +1,13 @@
+{
+  "tests": [
+    {
+      "name": "POST get presigned url",
+      "method": "POST",
+      "path": "/",
+      "body": {"file_name": "test.pdf", "content_type": "application/pdf"},
+      "expectedStatus": 200,
+      "expectedBody": {"upload_url": "string", "cdn_url": "string"},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
