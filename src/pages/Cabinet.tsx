@@ -358,10 +358,11 @@ function RegistrationForm({ onDone }: { onDone: () => void }) {
 }
 
 /* ── Основной кабинет ── */
-export default function Cabinet({ registered = false, onRegistered }: { registered?: boolean; onRegistered?: () => void }) {
+export default function Cabinet({ onRegistered }: { onRegistered?: () => void }) {
   const [tab, setTab] = useState<'info' | 'payments' | 'notifications'>('info');
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const registered = localStorage.getItem('gsk_profile_complete') === 'true';
 
   if (submitted) {
     return (
@@ -408,9 +409,9 @@ export default function Cabinet({ registered = false, onRegistered }: { register
           >
             <Icon name="UserPlus" size={36} className="text-white" />
           </div>
-          <h2 className="text-xl font-bold text-foreground mb-2">Вы ещё не зарегистрированы</h2>
+          <h2 className="text-xl font-bold text-foreground mb-2">Добро пожаловать!</h2>
           <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-            Для получения доступа к личному кабинету члена ГСК заполните анкету. Это займёт около 3 минут.
+            Заполните анкету собственника гаража и подайте заявление о вступлении в ГСК. Это займёт около 3 минут.
           </p>
           <div className="w-full text-left space-y-2 mb-6">
             {[
