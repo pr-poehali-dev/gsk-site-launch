@@ -1,9 +1,9 @@
 import Icon from '@/components/ui/icon';
 
 const contacts = [
-  { role: 'Председатель ГСК', name: 'Николаев Борис Иванович', phone: '+7 (910) 123-45-67', email: 'nikolaev@gsk-avangard.ru', icon: 'Crown' },
-  { role: 'Бухгалтер', name: 'Громова Светлана Петровна', phone: '+7 (910) 234-56-78', email: 'gromova@gsk-avangard.ru', icon: 'Calculator' },
-  { role: 'Техник', name: 'Захаров Дмитрий Сергеевич', phone: '+7 (910) 345-67-89', email: 'zaharov@gsk-avangard.ru', icon: 'Wrench' },
+  { role: 'Председатель ГСК', name: 'Николаев Борис Иванович', phone: '+7 (910) 123-45-67', email: 'nikolaev@gsk-titan.ru', icon: 'Crown' },
+  { role: 'Бухгалтер', name: 'Громова Светлана Петровна', phone: '+7 (910) 234-56-78', email: 'gromova@gsk-titan.ru', icon: 'Calculator' },
+  { role: 'Техник', name: 'Захаров Дмитрий Сергеевич', phone: '+7 (910) 345-67-89', email: 'zaharov@gsk-titan.ru', icon: 'Wrench' },
   { role: 'Охрана (сторож)', name: 'Круглов Виктор Фёдорович', phone: '+7 (910) 456-78-90', email: '—', icon: 'Shield' },
 ];
 
@@ -74,7 +74,7 @@ export default function Contacts() {
               <Icon name="MapPin" size={18} className="text-primary" />
               Адрес кооператива
             </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">г. Нижний Новгород,<br />ул. Гаражная, квартал 14<br />ГСК «Авангард»</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">г. Нижний Новгород,<br />ул. Гаражная, квартал 14<br />ГСК «ТИТАН»</p>
           </div>
 
           <div className="bg-card border border-border rounded-xl p-5">

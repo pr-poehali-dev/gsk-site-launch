@@ -4,7 +4,7 @@ import Icon from '@/components/ui/icon';
 const categories = ['Все', 'Устав', 'Протоколы', 'Финансы', 'Договоры', 'Заявления'];
 
 const docs = [
-  { id: 1, name: 'Устав ГСК «Авангард»', cat: 'Устав', date: '12.01.2024', size: '1.2 МБ', icon: 'BookOpen' },
+  { id: 1, name: 'Устав ГСК «ТИТАН»', cat: 'Устав', date: '12.01.2024', size: '1.2 МБ', icon: 'BookOpen' },
   { id: 2, name: 'Протокол общего собрания № 4/2026', cat: 'Протоколы', date: '12.04.2026', size: '420 КБ', icon: 'FileText' },
   { id: 3, name: 'Протокол общего собрания № 3/2025', cat: 'Протоколы', date: '18.10.2025', size: '380 КБ', icon: 'FileText' },
   { id: 4, name: 'Финансовый отчёт за 2025 год', cat: 'Финансы', date: '28.02.2026', size: '860 КБ', icon: 'BarChart2' },

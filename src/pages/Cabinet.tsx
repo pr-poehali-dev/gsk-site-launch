@@ -455,7 +455,7 @@ export default function Cabinet({ registered = false, onRegistered }: { register
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="text-xl font-bold text-foreground">Петров Александр Николаевич</h2>
-          <p className="text-muted-foreground text-sm mt-0.5">Член ГСК «Авангард» с 2018 года</p>
+          <p className="text-muted-foreground text-sm mt-0.5">Член ГСК «ТИТАН» с 2018 года</p>
           <div className="flex flex-wrap gap-4 mt-3 text-sm">
             <span className="flex items-center gap-1.5 text-muted-foreground"><Icon name="Car" size={14} /> Бокс № 147</span>
             <span className="flex items-center gap-1.5 text-muted-foreground"><Icon name="Phone" size={14} /> +7 (912) 345-67-89</span>
